@@ -1,0 +1,48 @@
+
+[1] Loading dataset...
+[2] Splitting data (stratified)...
+[3] Feature engineering & scaling...
+[4] Training Isolation Forest...
+[5] Applying SMOTE...
+[6] Plotting PCA distributions...
+[7] Initializing & training supervised models...
+   → Training Logistic Regression...
+   → Training Random Forest...
+   → Training Gradient Boosting...
+[8] Training Voting Classifier...
+[9] Evaluating model...
+
+Optimal Threshold: 0.883
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     56864
+           1       0.95      0.79      0.86        98
+
+    accuracy                           1.00     56962
+   macro avg       0.98      0.89      0.93     56962
+weighted avg       1.00      1.00      1.00     56962
+
+
+Confusion Matrix (Raw Counts):
+[[56860     4]
+ [   21    77]]
+
+Fraud Detection Summary:
+✔ True Positives (Fraud correctly detected): 77
+✘ False Negatives (Fraud missed): 21
+✘ False Positives (Normal flagged as fraud): 4
+✔ True Negatives (Normal correctly classified): 56860
+
+Evaluation Metrics Summary:
+ROC-AUC : 0.9789
+PR-AUC  : 0.8738
+
+Fraud Class Metrics:
+Fraud Precision: 0.9506
+Fraud Recall   : 0.7857
+
+Interpretation:
+The selected threshold (0.883) prioritizes precision over recall, which is appropriate for fraud detection where false positives are costly. The model successfully detects most fraudulent transactions while minimizing unnecessary alerts for legitimate users.
+[10] Saving pipeline...
+
+✅ Final pipeline saved.

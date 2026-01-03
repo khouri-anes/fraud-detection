@@ -1,6 +1,5 @@
-# =========================================================
-# CREDIT CARD FRAUD DETECTION – FINAL VERSION (NO KNN)
-# =========================================================
+
+# CREDIT CARD FRAUD DETECTION – FINAL VERSION
 
 import numpy as np
 import pandas as pd
@@ -28,24 +27,26 @@ from sklearn.metrics import (
 )
 from imblearn.over_sampling import SMOTE
 
-# -------------------------
+
 # CONFIG
-# -------------------------
+
 RANDOM_STATE = 42
 np.random.seed(RANDOM_STATE)
 
-# =========================================================
+
 # 1. LOAD DATA
-# =========================================================
+
 print("\n[1] Loading dataset...")
 df = pd.read_csv("creditcard.csv")
 
+
+df = df.drop_duplicates()
 X = df.drop(columns=["Class"])
 y = df["Class"]
 
-# =========================================================
 # 2. TRAIN / TEST SPLIT
-# =========================================================
+
+
 print("[2] Splitting data (stratified)...")
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
@@ -54,9 +55,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=RANDOM_STATE
 )
 
-# =========================================================
+
 # 3. FEATURE ENGINEERING & SCALING
-# =========================================================
+
 print("[3] Feature engineering & scaling...")
 
 scaler = StandardScaler()
@@ -80,9 +81,9 @@ X_train["V12_V4"] = X_train["V12"] * X_train["V4"]
 X_test["V14_V10"] = X_test["V14"] * X_test["V10"]
 X_test["V12_V4"] = X_test["V12"] * X_test["V4"]
 
-# =========================================================
 # 4. ISOLATION FOREST (UNSUPERVISED OUTLIER DETECTION)
-# =========================================================
+
+
 print("[4] Training Isolation Forest...")
 
 iso_forest = IsolationForest(
@@ -96,16 +97,16 @@ iso_forest.fit(X_train)
 X_train["iforest_score"] = iso_forest.decision_function(X_train)
 X_test["iforest_score"] = iso_forest.decision_function(X_test)
 
-# =========================================================
+
 # 5. HANDLE IMBALANCE (SMOTE)
-# =========================================================
+
 print("[5] Applying SMOTE...")
 smote = SMOTE(random_state=RANDOM_STATE)
 X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
 
-# =========================================================
+
 # 6. PCA VISUALIZATION (IMBALANCED VS SMOTE)
-# =========================================================
+
 print("[6] Plotting PCA distributions...")
 
 pca = PCA(n_components=2)
@@ -136,9 +137,9 @@ plt.title("SMOTE Balanced Distribution")
 plt.legend()
 plt.show()
 
-# =========================================================
+
 # 7. SUPERVISED MODELS
-# =========================================================
+
 print("[7] Initializing & training supervised models...")
 
 lr = LogisticRegression(max_iter=1000)
@@ -155,9 +156,9 @@ for name, model in models.items():
     print(f"   → Training {name}...")
     model.fit(X_train_res, y_train_res)
 
-# =========================================================
+
 # 8. VOTING CLASSIFIER (SOFT)
-# =========================================================
+
 print("[8] Training Voting Classifier...")
 
 voting = VotingClassifier(
@@ -171,9 +172,9 @@ voting = VotingClassifier(
 
 voting.fit(X_train_res, y_train_res)
 
-# =========================================================
+
 # 9. EVALUATION
-# =========================================================
+
 print("[9] Evaluating model...")
 
 y_prob = voting.predict_proba(X_test)[:, 1]
@@ -211,9 +212,10 @@ y_pred = (y_prob >= best_thresh).astype(int)
 print("\nOptimal Threshold:", round(best_thresh,4))
 print(classification_report(y_test, y_pred))
 
-# -------------------------
+
 # Confusion Matrix (RAW COUNTS)
-# -------------------------
+
+
 cm_raw = confusion_matrix(y_test, y_pred)
 
 tn, fp, fn, tp = cm_raw.ravel()
